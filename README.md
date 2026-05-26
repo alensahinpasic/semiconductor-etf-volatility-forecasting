@@ -1,4 +1,4 @@
-# Replication Notebook — README
+# README
 ## Forecasting Short-Term Semiconductor ETF Volatility
 ### A Multi-Layer HAR Model with Microstructure Indicators and NLP Sentiment
 
