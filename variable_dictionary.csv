@@ -1,0 +1,20 @@
+variable_name,dataset,type,units,source,description,notes
+date,LSEG_headlines_clean.csv,string,YYYY-MM-DD,LSEG/Refinitiv,Trading day of the headline,Aligned to NYSE/NASDAQ trading calendar
+time,LSEG_headlines_clean.csv,string,HH:MM:SS,LSEG/Refinitiv,Publication time in UTC,Null for no-news placeholder rows
+source,LSEG_headlines_clean.csv,string,categorical,LSEG/Refinitiv,"News provider code: RTRS=Reuters, ASSPR=AP, ASINIK, FT",Null for no-news placeholder rows
+ticker,LSEG_headlines_clean.csv,string,Refinitiv RIC,LSEG/Refinitiv,Refinitiv ticker(s) associated with the headline,"Null for sector-level headlines; multiple tickers separated by space"
+headline,LSEG_headlines_clean.csv,string,text,LSEG/Refinitiv,Full headline text as published,Null for no-news placeholder rows (42 rows)
+Open,Market data,float,USD,Yahoo Finance (yfinance),Daily opening price for SMH or SOXX,Downloaded fresh each notebook run
+High,Market data,float,USD,Yahoo Finance (yfinance),Daily high price for SMH or SOXX,Downloaded fresh each notebook run
+Low,Market data,float,USD,Yahoo Finance (yfinance),Daily low price for SMH or SOXX,Downloaded fresh each notebook run
+Close,Market data,float,USD,Yahoo Finance (yfinance),Daily closing price for SMH or SOXX,Downloaded fresh each notebook run
+Volume,Market data,integer,shares,Yahoo Finance (yfinance),Daily trading volume for SMH or SOXX,Downloaded fresh each notebook run
+GK_t,Derived,float,dimensionless,Computed from OHLC,"Garman-Klass daily volatility: sqrt(0.5*[ln(H/L)]^2 - (2*ln2-1)*[ln(C/O)]^2)",Always positive; approximates annualised daily volatility when scaled
+GK_t_h,Derived,float,dimensionless,Computed from GK_t,"h-day ahead average volatility target: (1/h) * sum(GK_{t+j}, j=1 to h)",Computed for h=1,2,3,4,5; used as forecast target
+GK_d,Derived (HAR component),float,dimensionless,Computed from GK_t,Previous day Garman-Klass volatility: GK_{t-1},Daily HAR component
+GK_w,Derived (HAR component),float,dimensionless,Computed from GK_t,5-day average GK volatility: mean(GK_{t-1} to GK_{t-5}),Weekly HAR component
+GK_m,Derived (HAR component),float,dimensionless,Computed from GK_t,22-day average GK volatility: mean(GK_{t-1} to GK_{t-22}),Monthly HAR component
+Range_t,Derived (microstructure),float,dimensionless,Computed from OHLC,"Log high-low range: ln(H_t / L_t)",Always positive; measures intraday price dispersion; structurally related to GK_t
+RelVol_t,Derived (microstructure),float,ratio,Computed from Volume,"Relative volume: Volume_t / MA_20(Volume_t)",First 19 observations unavailable due to rolling window; values near 1.0 indicate normal volume
+s_i,Derived (NLP),float,[-1 to 1],ProsusAI/finbert,"Headline-level net sentiment: P(positive_i) - P(negative_i)","Computed per headline using FinBERT (Araci 2019); range approx -1 to +1"
+S_t,Derived (NLP),float,[-1 to 1],Aggregated from s_i,"Daily average net sentiment: mean(s_i) across all headlines on day t",Set to 0 on no-news days; intentionally simple average without source weighting
